@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anti Ngemis-Ngemis - Edisi Eksklusif</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --dark-navy: #0B132B;
+            --darker-navy: #1A1A2E;
+            --cream: #FDFBF7;
+            --gold: #D4AF37;
+            --bronze: #C5A880;
+            --text-dark: #2C3E50;
+            --text-light: #5A6B7C;
+            --white: #FFFFFF;
+            --success: #10B981;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cream);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* MODAL OVERLAY */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(11, 19, 43, 0.9);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-container {
+            background: var(--white);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 100px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: var(--cream);
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--gold);
+            color: var(--dark-navy);
+            transform: rotate(90deg);
+        }
+
+        /* CHECKOUT HEADER */
+        .checkout-header {
+            background: linear-gradient(135deg, var(--dark-navy) 0%, var(--darker-navy) 100%);
+            color: var(--white);
+            padding: 3rem 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .checkout-header::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -30%;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .checkout-header h2 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .checkout-header p {
+            color: var(--bronze);
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* PRODUCT SUMMARY */
+        .product-summary {
+            background: var(--cream);
+            padding: 2rem 2.5rem;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .product-info {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .product-image {
+            width: 80px; height: 110px;
+            background: linear-gradient(135deg, var(--dark-navy) 0%, var(--darker-navy) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-align: center;
+            border: 3px solid var(--gold);
+            flex-shrink: 0;
+            line-height: 1.2;
+        }
+
+        .product-details h3 {
+            color: var(--dark-navy);
+            font-size: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .product-details p {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .price-tag {
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .original-price {
+            color: var(--text-light);
+            text-decoration: line-through;
+            font-size: 1rem;
+        }
+
+        .discount-price {
+            color: var(--gold);
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-family: 'Cormorant Garamond', serif;
+        }
+
+        .discount-badge {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: var(--white);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* ORDER FORM */
+        .order-form { padding: 2.5rem; }
+
+        .form-section { margin-bottom: 2rem; }
+
+        .form-section h4 {
+            color: var(--dark-navy);
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-section h4::before {
+            content: '';
+            width: 4px; height: 20px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+
+        .form-group label {
+            display: block;
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group label .required { color: #EF4444; }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+        }
+
+        .form-group input.error { border-color: #EF4444; }
+
+        .error-message {
+            color: #EF4444;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+            display: none;
+        }
+
+        .error-message.show { display: block; }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* PAYMENT METHODS */
+        .payment-methods { display: grid; gap: 1rem; }
+
+        .payment-option {
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .payment-option:hover {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .payment-option.selected {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+        }
+
+        .payment-option input[type="radio"] {
+            width: 20px; height: 20px;
+            accent-color: var(--gold);
+        }
+
+        .payment-icon {
+            width: 50px; height: 35px;
+            background: var(--white);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-light);
+            border: 1px solid #E5E7EB;
+            flex-shrink: 0;
+        }
+
+        .payment-label strong {
+            display: block;
+            color: var(--dark-navy);
+            margin-bottom: 0.2rem;
+        }
+
+        .payment-label span {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* SUBMIT BUTTON */
+        .form-actions { margin-top: 2.5rem; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1.3rem;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+            color: var(--dark-navy);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5);
+        }
+
+        .btn-submit.processing {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        /* THANK YOU PAGE */
+        .thank-you-content {
+            text-align: center;
+            padding: 4rem 2.5rem;
+        }
+
+        .success-icon {
+            width: 100px; height: 100px;
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            animation: scaleIn 0.5s ease;
+        }
+
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .success-icon svg {
+            width: 50px; height: 50px;
+            color: var(--white);
+        }
+
+        .thank-you-content h2 {
+            color: var(--dark-navy);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .thank-you-content p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .order-details {
+            background: var(--cream);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .order-details h3 {
+            color: var(--dark-navy);
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: var(--dark-navy);
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--gold);
+        }
+
+        .download-section {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(197, 168, 128, 0.1) 100%);
+            border: 2px dashed var(--gold);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .download-section h3 {
+            color: var(--dark-navy);
+            margin-bottom: 1rem;
+        }
+
+        .download-section p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+            color: var(--dark-navy);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5);
+        }
+
+        .whatsapp-cta {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--white);
+            border-radius: 12px;
+            border: 2px solid #E5E7EB;
+        }
+
+        .whatsapp-cta p { margin-bottom: 1rem; font-size: 0.95rem; }
+
+        .btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.9rem 2rem;
+            background: #25D366;
+            color: var(--white);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-whatsapp:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+        }
+
+        /* SPINNER */
+        .spinner {
+            width: 24px; height: 24px;
+            border: 3px solid rgba(11, 19, 43, 0.2);
+            border-top-color: var(--dark-navy);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* LANDING PAGE STYLES */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(253, 251, 247, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(11, 19, 43, 0.08);
+            padding: 1.2rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark-navy);
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--gold); }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover { color: var(--gold); }
+
+        .hero {
+            background: linear-gradient(135deg, var(--dark-navy) 0%, var(--darker-navy) 100%);
+            padding: 7rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%; right: -10%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+            color: var(--dark-navy);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero h1 span {
+            color: var(--gold);
+            font-style: italic;
+        }
+
+        .hero-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.6rem;
+            color: var(--bronze);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+        }
+
+        .hero-tags {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .hero-tags span:not(:last-child)::after {
+            content: '·';
+            margin-left: 1.5rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+            color: var(--dark-navy);
+            padding: 1.2rem 3rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.05rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.5);
+        }
+
+        /* =========================================
+           3D BOOK MOCKUP (OBJEK DI KANAN)
+           ========================================= */
+        .book-showcase {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1500px;
+            position: relative;
+        }
+
+        .book-3d {
+            width: 280px;
+            height: 420px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateY(-25deg) rotateX(5deg);
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            animation: floatBook 4s ease-in-out infinite;
+        }
+
+        .book-3d:hover {
+            transform: rotateY(-15deg) rotateX(0deg) scale(1.05);
+        }
+
+        @keyframes floatBook {
+            0%, 100% { transform: rotateY(-25deg) rotateX(5deg) translateY(0); }
+            50% { transform: rotateY(-25deg) rotateX(5deg) translateY(-15px); }
+        }
+
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1A1A2E 0%, #0B132B 100%);
+            border-radius: 4px 16px 16px 4px;
+            box-shadow: 
+                -25px 25px 50px rgba(0, 0, 0, 0.6),
+                inset 5px 0 15px rgba(255, 255, 255, 0.1),
+                inset -3px 0 5px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2.5rem;
+            text-align: center;
+            border-left: 12px solid var(--gold);
+            backface-visibility: hidden;
+        }
+
+        .book-cover::before {
+            content: '';
+            position: absolute;
+            top: 20px; left: 25px; right: 15px; bottom: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .book-cover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+            border-radius: 4px 16px 16px 4px;
+            pointer-events: none;
+        }
+
+        .book-title {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--gold);
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        .book-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .book-author {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .book-spine {
+            position: absolute;
+            width: 40px;
+            height: 100%;
+            background: linear-gradient(90deg, #0B132B 0%, #1A1A2E 100%);
+            transform: rotateY(-90deg) translateZ(20px);
+            left: -20px;
+            border-radius: 4px 0 0 4px;
+            box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .book-spine::after {
+            content: 'ANTI NGEMIS-NGEMIS';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            color: var(--gold);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+
+        .book-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .section-padding { padding: 7rem 0; }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.8rem;
+            color: var(--dark-navy);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 3rem 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(11, 19, 43, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(11, 19, 43, 0.12);
+        }
+
+        .card h3 {
+            font-size: 1.4rem;
+            color: var(--dark-navy);
+            margin: 1.5rem 0 1rem;
+        }
+
+        .card p {
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .icon-box {
+            width: 60px; height: 60px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(197, 168, 128, 0.1) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .solution-section {
+            background: linear-gradient(135deg, var(--dark-navy) 0%, var(--darker-navy) 100%);
+            color: var(--white);
+        }
+
+        .solution-section .section-header h2 { color: var(--white); }
+        .solution-section .section-header p { color: rgba(255,255,255,0.7); }
+
+        .solution-content {
+            max-width: 850px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .solution-content p {
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.9;
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-content strong { color: var(--gold); }
+
+        .feature-card { text-align: center; }
+
+        .feature-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px; height: 70px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+            color: var(--dark-navy);
+            border-radius: 50%;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-section { background: var(--white); }
+
+        .testimonial-card {
+            background: var(--cream);
+            padding: 2.5rem;
+            border-radius: 16px;
+            position: relative;
+        }
+
+        .quote-icon {
+            position: absolute;
+            top: 10px; right: 25px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 7rem;
+            color: var(--gold);
+            opacity: 0.15;
+        }
+
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-avatar {
+            width: 55px; height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--gold);
+        }
+
+        .testimonial-info h4 {
+            color: var(--dark-navy);
+            margin-bottom: 0.2rem;
+        }
+
+        .stars { color: var(--gold); }
+
+        .cta-section {
+            background: linear-gradient(135deg, var(--dark-navy) 0%, var(--darker-navy) 100%);
+            text-align: center;
+            color: var(--white);
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2.5rem;
+        }
+
+        footer {
+            background: var(--dark-navy);
+            padding: 2.5rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        @media (max-width: 992px) {
+            .hero-container { grid-template-columns: 1fr; }
+            .grid-3 { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 3rem; }
+            .book-3d { width: 220px; height: 330px; }
+            .book-title { font-size: 2rem; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero { padding: 4rem 1.5rem; }
+            .hero h1 { font-size: 2.5rem; }
+            .form-row { grid-template-columns: 1fr; }
+            .product-info { flex-direction: column; text-align: center; }
+            .price-tag { justify-content: center; }
+            .book-3d { width: 180px; height: 270px; }
+            .book-title { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#" class="logo">Anti <span>Ngemis-Ngemis</span></a>
+            <ul class="nav-links">
+                <li><a href="#masalah">Masalah</a></li>
+                <li><a href="#solusi">Solusi</a></li>
+                <li><a href="#isi">Isi E-Book</a></li>
+                <li><a href="#testimoni">Testimoni</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <span class="badge">E-Book · Edisi Eksklusif</span>
+                <h1>Anti <span>Ngemis-Ngemis</span></h1>
+                <p class="hero-subtitle">— karena daya tarik sejati tidak pernah meminta.</p>
+                <p class="hero-description">
+                    Rencana Aksi Menarik Seseorang Tanpa Mengemis Perhatian. Untuk mereka yang ingin dicintai karena siapa mereka, bukan karena seberapa keras mereka berusaha terlihat layak.
+                </p>
+                <div class="hero-tags">
+                    <span>Elegan</span>
+                    <span>Berkelas</span>
+                    <span>Berdaya Tarik Alami</span>
+                </div>
+                <button class="cta-button" onclick="openCheckout()">Ya, Saya Siap Berubah Sekarang →</button>
+            </div>
+            
+            <!-- 3D Book Mockup -->
+            <div class="book-showcase">
+                <div class="book-glow"></div>
+                <div class="book-3d">
+                    <div class="book-spine"></div>
+                    <div class="book-cover">
+                        <div class="book-title">Anti<br>Ngemis-<br>Ngemis</div>
+                        <div class="book-subtitle">Edisi Eksklusif</div>
+                        <div class="book-author">Premium Guide</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="section-padding" id="masalah">
+        <div class="container">
+            <div class="section-header">
+                <h2>Apakah Ini Tentang Kamu?</h2>
+                <p>Kenali pola yang membuatmu terjebak dalam siklus mengemis perhatian</p>
+            </div>
+            <div class="grid-3">
+                <div class="card">
+                    <div class="icon-box">⏳</div>
+                    <h3>Usaha Berlebih yang Diabaikan</h3>
+                    <p>Kamu sudah melakukan segalanya — selalu ada, selalu responsif, selalu berusaha — tapi mengapa rasanya semakin diabaikan?</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box">💔</div>
+                    <h3>Harga Diri Tergantung Notifikasi</h3>
+                    <p>Setiap kali kamu menunggu balasan pesannya, ada bagian dari dirimu yang merasa kecil.</p>
+                </div>
+                <div class="card">
+                    <div class="icon-box">📉</div>
+                    <h3>Semakin Dekat Semakin Jauh</h3>
+                    <p>Kamu ingin disukai, tapi entah mengapa semakin mendekat justru terasa seperti mendorong ia pergi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section -->
+    <section class="section-padding solution-section" id="solusi">
+        <div class="container">
+            <div class="section-header">
+                <h2>Mengapa E-Book Ini Berbeda</h2>
+            </div>
+            <div class="solution-content">
+                <p>E-book ini bukan tentang trik atau manipulasi. Ini adalah peta jalan psikologis yang membantumu membangun daya tarik alami.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section-padding" id="isi">
+        <div class="container">
+            <div class="section-header">
+                <h2>Yang Akan Kamu Dapatkan</h2>
+            </div>
+            <div class="grid-3">
+                <div class="card feature-card">
+                    <div class="feature-number">01</div>
+                    <h3>Membangun Aura yang Berbicara Sendiri</h3>
+                    <p>Langkah konkret untuk memancarkan kepercayaan diri yang tenang.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-number">02</div>
+                    <h3>Seni Memberi Jarak yang Justru Mendekatkan</h3>
+                    <p>Panduan psikologis untuk memahami kapan harus hadir dan kapan harus menjauh.</p>
+                </div>
+                <div class="card feature-card">
+                    <div class="feature-number">03</div>
+                    <h3>Komunikasi Berkelas</h3>
+                    <p>Teknik berinteraksi yang membuat setiap percakapan terasa bermakna.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="section-padding testimonial-section" id="testimoni">
+        <div class="container">
+            <div class="section-header">
+                <h2>Apa Kata Mereka</h2>
+            </div>
+            <div class="grid-3">
+                <div class="testimonial-card">
+                    <div class="quote-icon">"</div>
+                    <div class="testimonial-header">
+                        <img src="https://ui-avatars.com/api/?name=Andi+Pratama&background=D4AF37&color=0B132B&size=128" alt="Andi" class="profile-avatar">
+                        <div class="testimonial-info">
+                            <h4>Andi Pratama</h4>
+                            <div class="stars">★★★★★</div>
+                        </div>
+                    </div>
+                    <p>"Setelah baca e-book ini, saya sadar selama ini saya terlalu 'available'. Sekarang justru dia yang semakin mengejar."</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote-icon">"</div>
+                    <div class="testimonial-header">
+                        <img src="https://ui-avatars.com/api/?name=Rina+Susanti&background=C5A880&color=0B132B&size=128" alt="Rina" class="profile-avatar">
+                        <div class="testimonial-info">
+                            <h4>Rina Susanti</h4>
+                            <div class="stars">★★★★★</div>
+                        </div>
+                    </div>
+                    <p>"Ini benar-benar mengubah mindset saya tentang harga diri. Sekarang saya tidak lagi bergantung pada validasi orang lain."</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote-icon">"</div>
+                    <div class="testimonial-header">
+                        <img src="https://ui-avatars.com/api/?name=Budi+Santoso&background=1A1A2E&color=D4AF37&size=128" alt="Budi" class="profile-avatar">
+                        <div class="testimonial-info">
+                            <h4>Budi Santoso</h4>
+                            <div class="stars">★★★★★</div>
+                        </div>
+                    </div>
+                    <p>"E-book ini tidak mengajarkan manipulasi. Tapi membangun karakter yang benar-benar menarik."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section-padding cta-section" id="beli">
+        <div class="container">
+            <h2>Sudah Siap untuk Berubah?</h2>
+            <p>Berhenti mengemis perhatian. Mulailah menjadi alasan seseorang tidak bisa berhenti memikirkanmu.</p>
+            <button class="cta-button" onclick="openCheckout()">Ya, Saya Siap Berubah Sekarang →</button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Anti Ngemis-Ngemis. All rights reserved.</p>
+    </footer>
+
+    <!-- CHECKOUT MODAL -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeCheckout()">×</button>
+            
+            <div id="checkoutForm">
+                <div class="checkout-header">
+                    <h2>Lengkapi Pesanan Anda</h2>
+                    <p>Isi data di bawah untuk mendapatkan e-book Anti Ngemis-Ngemis</p>
+                </div>
+
+                <div class="product-summary">
+                    <div class="product-info">
+                        <div class="product-image">Anti<br>Ngemis-<br>Ngemis</div>
+                        <div class="product-details">
+                            <h3>E-Book Anti Ngemis-Ngemis (Edisi Eksklusif)</h3>
+                            <p>Format: PDF Digital Download</p>
+                            <div class="price-tag">
+                                <span class="original-price">Rp 97.000</span>
+                                <span class="discount-price">Rp 37.000</span>
+                                <span class="discount-badge">HEMAT 62%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form class="order-form" id="orderForm" onsubmit="processOrder(event)">
+                    <div class="form-section">
+                        <h4>Data Pemesan</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nama Lengkap <span class="required">*</span></label>
+                                <input type="text" id="nama" placeholder="Contoh: Ahmad Rizki" required>
+                                <span class="error-message">Nama harus diisi</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Email Aktif <span class="required">*</span></label>
+                                <input type="email" id="email" placeholder="contoh@email.com" required>
+                                <span class="error-message">Email tidak valid</span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Nomor WhatsApp <span class="required">*</span></label>
+                                <input type="tel" id="whatsapp" placeholder="08123456789" required>
+                                <span class="error-message">Nomor WhatsApp harus diisi</span>
+                            </div>
+                            <div class="form-group">
+                                <label>Kota Domisili</label>
+                                <input type="text" id="kota" placeholder="Contoh: Jakarta">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Metode Pembayaran</h4>
+                        <div class="payment-methods">
+                            <label class="payment-option selected">
+                                <input type="radio" name="payment" value="transfer" checked>
+                                <div class="payment-icon">BANK</div>
+                                <div class="payment-label">
+                                    <strong>Transfer Bank</strong>
+                                    <span>BCA, Mandiri, BNI, BRI</span>
+                                </div>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="payment" value="ewallet">
+                                <div class="payment-icon">E-WALLET</div>
+                                <div class="payment-label">
+                                    <strong>E-Wallet</strong>
+                                    <span>GoPay, OVO, Dana, ShopeePay</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            Bayar Sekarang - Rp 37.000
+                        </button>
+                        <div class="secure-badge">
+                            <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                            </svg>
+                            <span>Pembayaran Aman & Terenkripsi</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Thank You Page -->
+            <div id="thankYouPage" style="display: none;">
+                <div class="thank-you-content">
+                    <div class="success-icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <h2>Pesanan Berhasil!</h2>
+                    <p>Terima kasih telah memesan E-Book Anti Ngemis-Ngemis.<br>Pesanan Anda sedang diproses.</p>
+
+                    <div class="order-details">
+                        <h3>Detail Pesanan</h3>
+                        <div class="detail-row">
+                            <span>No. Order:</span>
+                            <span id="orderNumber">#ANN-2026001</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Nama:</span>
+                            <span id="thankYouName">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Email:</span>
+                            <span id="thankYouEmail">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>Total Pembayaran:</span>
+                            <span>Rp 37.000</span>
+                        </div>
+                    </div>
+
+                    <div class="download-section">
+                        <h3> Download E-Book</h3>
+                        <p>Klik tombol di bawah untuk download e-book Anda:</p>
+                        <a href="#" class="btn-download" onclick="alert('Fitur download akan aktif setelah pembayaran dikonfirmasi'); return false;">
+                            Download E-Book PDF
+                        </a>
+                    </div>
+
+                    <div class="whatsapp-cta">
+                        <p><strong>Butuh bantuan?</strong><br>Tim kami siap membantu Anda via WhatsApp</p>
+                        <a href="https://wa.me/6283133394345?text=Halo%20saya%20baru%20saja%20order%20E-Book%20Anti%20Ngemis-Ngemis" class="btn-whatsapp" target="_blank">
+                            Hubungi WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openCheckout() {
+            document.getElementById('checkoutModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCheckout() {
+            document.getElementById('checkoutModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('checkoutModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCheckout();
+        });
+
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        function processOrder(e) {
+            e.preventDefault();
+            
+            const nama = document.getElementById('nama').value;
+            const email = document.getElementById('email').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+            
+            if (!nama || !email || !whatsapp) {
+                alert('Mohon lengkapi semua field yang wajib diisi');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.classList.add('processing');
+            submitBtn.innerHTML = '<div class="spinner"></div> Memproses...';
+            
+            setTimeout(() => {
+                const orderNumber = '#ANN-' + new Date().getFullYear() + Math.floor(Math.random() * 9000 + 1000);
+                
+                document.getElementById('orderNumber').textContent = orderNumber;
+                document.getElementById('thankYouName').textContent = nama;
+                document.getElementById('thankYouEmail').textContent = email;
+                
+                document.getElementById('checkoutForm').style.display = 'none';
+                document.getElementById('thankYouPage').style.display = 'block';
+                
+                submitBtn.classList.remove('processing');
+                submitBtn.innerHTML = 'Bayar Sekarang - Rp 37.000';
+                
+                const message = `Halo, saya ingin konfirmasi pesanan:\n\nNama: ${nama}\nEmail: ${email}\nWhatsApp: ${whatsapp}\nOrder: ${orderNumber}\n\nTotal: Rp 37.000`;
+                const whatsappLink = `https://wa.me/6283133394345?text=${encodeURIComponent(message)}`;
+                
+                setTimeout(() => {
+                    window.open(whatsappLink, '_blank');
+                }, 1000);
+                
+            }, 2000);
+        }
+
+        document.querySelectorAll('input[required]').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.classList.add('error');
+                    this.nextElementSibling.classList.add('show');
+                } else {
+                    this.classList.remove('error');
+                    this.nextElementSibling.classList.remove('show');
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.remove('error');
+                    this.nextElementSibling.classList.remove('show');
+                }
+            });
+        });
+
+        document.getElementById('email').addEventListener('blur', function() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(this.value)) {
+                this.classList.add('error');
+                this.nextElementSibling.textContent = 'Format email tidak valid';
+                this.nextElementSibling.classList.add('show');
+            } else {
+                this.classList.remove('error');
+                this.nextElementSibling.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
